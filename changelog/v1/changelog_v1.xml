@@ -1,0 +1,22 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.28.xsd">
+
+    <changeSet id="1" author="jenil" >
+        <sqlFile path="./changeset_1.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="2" author="jenil" >
+        <sqlFile path="./changeset_2.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="2_tag" author="jenil" >
+      <tagDatabase tag="version_1.2"/>
+    </changeSet>
+    <changeSet id="3" author="jenil">
+        <sqlFile path="./changeset_3.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="3_tag" author="jenil" >
+      <tagDatabase tag="version_1.3"/>
+    </changeSet>
+</databaseChangeLog>
