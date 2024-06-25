@@ -1,69 +1,48 @@
 pipeline {
-    agent any
-    
-    parameters {
-        string(name: 'COMMIT_HASH', description: 'Commit hash to checkout')
+  agent {
+    docker { image 'liquibase/liquibase:4.4.2' }
+  }
+    node {
+    stage("Hello") {
+      print "Hi!"
+
+      if (params.commit_sha?.trim()) {
+        print "Checking out commit ${commit_sha}"
+
+        scmVars = checkout([
+          $class: 'GitSCM',
+          branches: scm.branches,
+          extensions: scm.extensions,
+          userRemoteConfigs: scm.userRemoteConfigs
+        ])
+      } else {
+        print "Checking out master"
+
+        scmVars = checkout([
+          $class: 'GitSCM',
+          branches: [[name: params.commit_sha]],
+          userRemoteConfigs: scm.userRemoteConfigs
+        ])
+      }
     }
-    
-    stages {
-        stage('Checkout Specific Commit') {
-            steps {
-                script {
-                    // Define the repository URL
-                    def repoUrl = 'https://github.com/JB-Shah/liquibase_jenikins.git'
-                    
-                    // Use the parameter value as the commit hash
-                    def commitHash = params.COMMIT_HASH
-                    
-                    // Perform the checkout
-                    checkout([$class: 'GitSCM', 
-                              branches: [[name: commitHash]], 
-                              userRemoteConfigs: [[url: repoUrl]],
-                              extensions: [[$class: 'CheckoutOption', timeout: 10]]])
-                }
-            }
-        }
-        
-        stage('Find Changelog Files') {
-            steps {
-                script {
-                    // Assuming your Liquibase changelog files are in a specific directory
-                    def changelogDir = './path/to/changelog/directory'
-                    
-                    // Use git command to list files created up to the specified commit
-                    def gitCommand = "git log --pretty=format: --name-only ${params.COMMIT_HASH} -- ${changelogDir}"
-                    def changelogFiles = sh(script: gitCommand, returnStdout: true).trim().split('\n')
-                    
-                    // Print out the changelog files found
-                    echo "Changelog files created up to commit ${params.COMMIT_HASH}:"
-                    changelogFiles.each { file ->
-                        echo "- ${file}"
-                    }
-                    
-                    // Pass the changelog files list to the next stage or use it as needed
-                    env.CHANGELOG_FILES = changelogFiles.join(' ')
-                }
-            }
-        }
-        
-        stage('Migrate Changelog Files') {
-            steps {
-                script {
-                    // Use the changelog files obtained from the previous stage
-                    def changelogFiles = env.CHANGELOG_FILES
-                    
-                    // Execute Liquibase migration for each changelog file
-                    changelogFiles.each { file ->
-                        sh "liquibase update --url=jdbc:postgresql://172.17.0.1:5432/liquibase_db --driver=org.postgresql.Driver --changeLogFile=${file} --username=admin --password=admin"
-                    }
-                }
-            }
-        }
+  }
+
+  stages {
+
+    stage('Status') {
+      steps {
+        sh 'liquibase status --url="jdbc:postgresql://172.17.0.1:5432/liquibase_db" --driver=org.postgresql.Driver --changeLogFile=./root_changelog.xml --username=admin --password=admin'
+      }
     }
-    
-    post {
-        always {
-            cleanWs()
-        }
+    stage('Update') {
+      steps {
+        sh 'liquibase update --url="jdbc:postgresql://172.17.0.1:5432/liquibase_db" --driver=org.postgresql.Driver --changeLogFile=./root_changelog.xml --username=admin --password=admin'
+      }
     }
+  }
+  post {
+    always {
+      cleanWs()
+    }
+  }
 }
