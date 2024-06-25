@@ -2,23 +2,27 @@ pipeline {
   agent {
     docker { image 'liquibase/liquibase:4.4.2' }
   }
+  parameters {
+    string(name: 'commit_sha', description: 'Commit hash to checkout', defaultValue: '')
+  }
   stages {
-    stage("Hello") {
+    stage("Checkout Specific Commit") {
       steps {
         script {
-          print "Hi!"
+          def scmVars
 
           if (params.commit_sha?.trim()) {
             print "Checking out commit ${params.commit_sha}"
 
-            scmVars = checkout scmGit(
-              branches: scm.branches,
-              extensions: scm.extensions,
-              userRemoteConfigs: scm.userRemoteConfigs
-            )
+            // Checkout specific commit
+            scmVars = checkout([$class: 'GitSCM', 
+                                branches: [[name: params.commit_sha]], 
+                                userRemoteConfigs: [[url: scm.userRemoteConfigs[0].url]],
+                                extensions: [[$class: 'CheckoutOption', timeout: 10]]])
           } else {
             print "Checking out master"
 
+            // Checkout default branch (master)
             scmVars = checkout(scm)
           }
         }
