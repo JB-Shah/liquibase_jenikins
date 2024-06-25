@@ -1,40 +1,22 @@
 pipeline {
   agent {
-    docker { 
-      image 'liquibase/liquibase:4.4.2' 
-    }
+    docker { image 'liquibase/liquibase:4.4.2' }
   }
-  
-  environment {
-    DATABASE_URL = 'jdbc:postgresql://postgres:5432/liquibase_db'
-    DATABASE_DRIVER = 'org.postgresql.Driver'
-    DATABASE_CHANGELOG = 'root_changelog.xml'
-    DATABASE_USERNAME = "admin"
-    DATABASE_PASSWORD = "admin"
-  }
-
   stages {
     stage('Status') {
       steps {
-        script {
-          sh "liquibase status --url=${env.DATABASE_URL} --driver=${env.DATABASE_DRIVER} --changeLogFile=${env.DATABASE_CHANGELOG} --username=${env.DATABASE_USERNAME} --password=${env.DATABASE_PASSWORD}"
-        }
+        sh 'liquibase status --url="jdbc:postgresql://postgres:3306/liquibase_db" --driver=org.postgresql.Driver --changeLogFile=./root_changelog.xml --username=admin --password=admin'
       }
     }
     stage('Update') {
       steps {
-        script {
-          sh "liquibase update --url=${env.DATABASE_URL} --driver=${env.DATABASE_DRIVER} --changeLogFile=${env.DATABASE_CHANGELOG} --username=${env.DATABASE_USERNAME} --password=${env.DATABASE_PASSWORD}"
-        }
+        sh 'liquibase update --url="jdbc:mysql://192.168.32.11:3306/my_app" --driver=org.postgresql.Driver --changeLogFile=my_app-wrapper.xml --username=$MARIADB_CREDS_USR --password=$MARIADB_CREDS_PSW'
       }
     }
   }
-  
   post {
     always {
-      node {
-        cleanWs()
-      }
+      cleanWs()
     }
   }
 }
