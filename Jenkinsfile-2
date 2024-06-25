@@ -2,7 +2,6 @@ pipeline {
   agent {
     docker { 
       image 'liquibase/liquibase:4.4.2' 
-      args '-v $HOME/.m2:/root/.m2' // Example volume mount if needed
     }
   }
   
@@ -10,8 +9,8 @@ pipeline {
     DATABASE_URL = 'jdbc:postgresql://postgres:5432/liquibase_db'
     DATABASE_DRIVER = 'org.postgresql.Driver'
     DATABASE_CHANGELOG = 'root_changelog.xml'
-    DATABASE_USERNAME = credentials('postgres-admin-username')
-    DATABASE_PASSWORD = credentials('postgres-admin-password')
+    DATABASE_USERNAME = "admin"
+    DATABASE_PASSWORD = "admin"
   }
 
   stages {
