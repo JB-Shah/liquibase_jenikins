@@ -1,13 +1,14 @@
 pipeline {
   agent {
     docker { image 'liquibase/liquibase:4.4.2' }
-  }
-  agent any
     parameters {
-        gitParameter name: 'TAG',
-                     type: 'PT_TAG',
-                     defaultValue: 'master'
+      gitParameter name: 'TAG',
+                    type: 'PT_TAG',
+                    defaultValue: 'master'
   }
+  }
+  
+
   stages {
     stage('Example') {
             steps {
@@ -21,7 +22,7 @@ pipeline {
                         ])
             }
     }
-    
+
     stage('Status') {
       steps {
         sh 'liquibase status --url="jdbc:postgresql://172.17.0.1:5432/liquibase_db" --driver=org.postgresql.Driver --changeLogFile=./root_changelog.xml --username=admin --password=admin'
