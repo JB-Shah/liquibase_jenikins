@@ -9,12 +9,11 @@ pipeline {
     if (params.commit_sha?.trim()) {
       print "Checking out commit ${commit_sha}"
 
-      scmVars = checkout([
-      $class: 'GitSCM',
+      scmVars = checkout scmGit(
       branches: scm.branches,
       extensions: scm.extensions,
       userRemoteConfigs: scm.userRemoteConfigs
-    ])
+    )
     } else {
       print "Checking out master"
 
