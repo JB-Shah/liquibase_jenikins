@@ -2,33 +2,34 @@ pipeline {
   agent {
     docker { image 'liquibase/liquibase:4.4.2' }
   }
-    node {
+  stages {
     stage("Hello") {
-      print "Hi!"
+      steps {
+        echo "Hi!"
 
-      if (params.commit_sha?.trim()) {
-        print "Checking out commit ${commit_sha}"
+        script {
+          def scmVars
+          if (params.commit_sha?.trim()) {
+            echo "Checking out commit ${params.commit_sha}"
 
-        scmVars = checkout([
-          $class: 'GitSCM',
-          branches: scm.branches,
-          extensions: scm.extensions,
-          userRemoteConfigs: scm.userRemoteConfigs
-        ])
-      } else {
-        print "Checking out master"
+            scmVars = checkout([
+              $class: 'GitSCM',
+              branches: scm.branches,
+              extensions: scm.extensions,
+              userRemoteConfigs: scm.userRemoteConfigs
+            ])
+          } else {
+            echo "Checking out master"
 
-        scmVars = checkout([
-          $class: 'GitSCM',
-          branches: [[name: params.commit_sha]],
-          userRemoteConfigs: scm.userRemoteConfigs
-        ])
+            scmVars = checkout([
+              $class: 'GitSCM',
+              branches: [[name: 'master']],
+              userRemoteConfigs: scm.userRemoteConfigs
+            ])
+          }
+        }
       }
     }
-  }
-
-  stages {
-
     stage('Status') {
       steps {
         sh 'liquibase status --url="jdbc:postgresql://172.17.0.1:5432/liquibase_db" --driver=org.postgresql.Driver --changeLogFile=./root_changelog.xml --username=admin --password=admin'
