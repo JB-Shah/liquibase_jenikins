@@ -8,6 +8,7 @@ pipeline {
   stages {
     stage("Fetch"){
       steps{
+        sh "sudo apt install git"
         script {
           def commitId = params.COMMIT_ID ? params.COMMIT_ID : 'HEAD'
           sh "git checkout -f ${commitId}"
