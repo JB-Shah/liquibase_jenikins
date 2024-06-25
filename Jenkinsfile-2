@@ -4,25 +4,26 @@ pipeline {
   }
   stages {
     stage("Hello") {
-    print "Hi!"
+      steps {
+        script {
+          print "Hi!"
 
-    if (params.commit_sha?.trim()) {
-      print "Checking out commit ${commit_sha}"
+          if (params.commit_sha?.trim()) {
+            print "Checking out commit ${params.commit_sha}"
 
-      scmVars = checkout scmGit(
-      branches: scm.branches,
-      extensions: scm.extensions,
-      userRemoteConfigs: scm.userRemoteConfigs
-    )
-    } else {
-      print "Checking out master"
+            scmVars = checkout scmGit(
+              branches: scm.branches,
+              extensions: scm.extensions,
+              userRemoteConfigs: scm.userRemoteConfigs
+            )
+          } else {
+            print "Checking out master"
 
-      scmVars = checkout(scm)
+            scmVars = checkout(scm)
+          }
+        }
+      }
     }
-  }
-
-
-
     stage('Status') {
       steps {
         sh 'liquibase status --url="jdbc:postgresql://172.17.0.1:5432/liquibase_db" --driver=org.postgresql.Driver --changeLogFile=./root_changelog.xml --username=admin --password=admin'
