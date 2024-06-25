@@ -2,10 +2,16 @@ pipeline {
   agent {
     docker { image 'liquibase/liquibase:4.4.2' }
   }
+  parameters {
+    string(name: 'COMMIT_ID', defaultValue: '', description: 'The commit ID to checkout')
+  }
   stages {
     stage("Fetch"){
       steps{
-        sh "git checkout -f $TAG"
+        script {
+          def commitId = params.COMMIT_ID ? params.COMMIT_ID : 'HEAD'
+          sh "git checkout -f ${commitId}"
+        }
       }
     }
     stage('Status') {
