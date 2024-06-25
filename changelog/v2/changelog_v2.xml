@@ -17,10 +17,5 @@
     <changeSet id="5_tag" author="jenil">
       <tagDatabase tag="version_2.2"/>
     </changeSet>
-    <changeSet id="6" author="jenil">
-        <sqlFile path="./changeset_3.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-    <changeSet id="6_tag" author="jenil">
-      <tagDatabase tag="version_2.3"/>
-    </changeSet>
+
 </databaseChangeLog>
