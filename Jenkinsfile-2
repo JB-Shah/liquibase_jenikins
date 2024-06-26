@@ -32,12 +32,12 @@ pipeline {
 
     stage('Status') {
       steps {
-        sh 'liquibase status --url="jdbc:postgresql://172.17.0.1:5432/liquibase_db" --driver=org.postgresql.Driver --changeLogFile=./root_changelog.xml --username=${params.username} --password=${params.password}'
+        sh '''liquibase status --url="jdbc:postgresql://172.17.0.1:5432/liquibase_db" --driver=org.postgresql.Driver --changeLogFile=./root_changelog.xml --username=${params.username} --password=${params.password}'''
       }
     }
     stage('Update') {
       steps {
-        sh 'liquibase update --url="jdbc:postgresql://172.17.0.1:5432/liquibase_db" --driver=org.postgresql.Driver --changeLogFile=./root_changelog.xml --username=${params.username} --password=${params.password}'
+        sh '''liquibase update --url="jdbc:postgresql://172.17.0.1:5432/liquibase_db" --driver=org.postgresql.Driver --changeLogFile=./root_changelog.xml --username=${params.username} --password=${params.password}'''
       }
     }
   }
