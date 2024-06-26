@@ -1,5 +1,5 @@
 node {
-    stage("Configuring git") {
+    stage("Configure Git") {
       print "Hi!"
 
       if (params.commit_sha?.trim()) {
@@ -21,7 +21,7 @@ node {
         ])
       }
     }
-  }
+}
 
 pipeline {
   agent {
